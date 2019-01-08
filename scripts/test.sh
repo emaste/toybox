@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source scripts/runtest.sh
 source scripts/portability.sh
