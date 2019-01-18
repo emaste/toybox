@@ -6,17 +6,17 @@
 
 #TODO: Find better tests
 
-testing "pwd" "[ $(stat -c %i "$(pwd)") = $(stat -c %i .) ] && echo yes" \
+testing "pwd" "[ $(stat -f %i "$(pwd)") = $(stat -f %i .) ] && echo yes" \
 	"yes\n" "" ""
-testing "-P" "[ $(stat -c %i "$(pwd -P)") = $(stat -c %i .) ] && echo yes" \
+testing "-P" "[ $(stat -f %i "$(pwd -P)") = $(stat -f %i .) ] && echo yes" \
 	"yes\n" "" ""
 
 
 ln -s . sym
 cd sym
-testing "pwd" "[ $(stat -c %i "$(pwd)") = $(stat -c %i "$PWD") ] && echo yes" \
+testing "pwd" "[ $(stat -f %i "$(pwd)") = $(stat -f %i "$PWD") ] && echo yes" \
 	"yes\n" "" ""
-testing "-P" "[ $(stat -c %i "$(pwd -P)") = $(stat -c %i "$PWD") ] || echo yes" \
+testing "-P" "[ $(stat -f %i "$(pwd -P)") = $(stat -f %i "$PWD") ] || echo yes" \
 	"yes\n" "" ""
 cd ..
 rm sym

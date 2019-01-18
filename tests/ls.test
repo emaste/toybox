@@ -46,7 +46,7 @@ rm -rf lstest/* && mkdir -p lstest/dir1 && touch lstest/file1.txt
 testing "nested recursively" "$IN && ls -R; $OUT" \
           ".:\ndir1\nfile1.txt\n\n./dir1:\n" "" ""
 
-rm -rf lstest/* && touch lstest/file1.txt && INODE=`stat -c %i lstest/file1.txt`
+rm -rf lstest/* && touch lstest/file1.txt && INODE=`stat -f %i lstest/file1.txt`
 testing "with -i" "$IN && ls -i 2>/dev/null; $OUT" "$INODE file1.txt\n" "" ""
 unset INODE
 
