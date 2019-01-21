@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # SUSv4 compliant sort tests.
 # Copyright 2005, 2012 by Rob Landley <rob@landley.net>

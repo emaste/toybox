@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Copyright 2014 Cynthia Rempel <cynthia@rtems.org>
 #
 # Brief: Some cursery coverage tests of ifconfig...

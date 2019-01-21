@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # POSIX 2008 compliant expand tests.
 # Copyright 2012 by Jonathan Clairembault <jonathan@clairembault.fr>
