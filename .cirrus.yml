@@ -5,4 +5,4 @@ freebsd12_task:
         script:
                 - gmake allnoconfig KCONFIG_ALLCONFIG=freebsd_miniconfig
                 - gmake
-        check_script: gmake tests
+        check_script: env VERBOSE=1 gmake tests
