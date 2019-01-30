@@ -9,7 +9,8 @@ then
   exit
 fi
 
-# We chgrp between "root" and the last group in /etc/group.
+ROOTGRP=root
+# We chgrp between "$ROOTGRP" and the last group in /etc/group.
 
 GRP="$(sed -n '$s/:.*//p' /etc/group)"
 
@@ -32,71 +33,71 @@ OUT="&& cd .. && echo \$(ls -lR testdir | awk '{print \$4}')"
 #testing "name" "command" "result" "infile" "stdin"
 
 # Basic smoketest
-testing "dir" "$IN chgrp root dir $OUT" \
-	"root $GRP $GRP $GRP $GRP $GRP $GRP\n" "" ""
-testing "file" "$IN chgrp root dir/file $OUT" \
-	"$GRP $GRP $GRP root $GRP $GRP $GRP\n" "" ""
-testing "dir and file" "$IN chgrp root dir dir/file $OUT" \
-	"root $GRP $GRP root $GRP $GRP $GRP\n" "" ""
+testing "dir" "$IN chgrp $ROOTGRP dir $OUT" \
+	"$ROOTGRP $GRP $GRP $GRP $GRP $GRP $GRP\n" "" ""
+testing "file" "$IN chgrp $ROOTGRP dir/file $OUT" \
+	"$GRP $GRP $GRP $ROOTGRP $GRP $GRP $GRP\n" "" ""
+testing "dir and file" "$IN chgrp $ROOTGRP dir dir/file $OUT" \
+	"$ROOTGRP $GRP $GRP $ROOTGRP $GRP $GRP $GRP\n" "" ""
 
 # symlinks (affect target, not symlink)
-testing "symlink->file" "$IN chgrp root dir2/file $OUT" \
-	"$GRP $GRP $GRP root $GRP $GRP $GRP\n" "" ""
-testing "symlink->dir" "$IN chgrp root dir2/dir $OUT" \
-	"$GRP $GRP root $GRP $GRP $GRP $GRP\n" "" ""
-testing "-h symlink->dir" "$IN chgrp -h root dir2/dir $OUT" \
-	"$GRP $GRP $GRP $GRP $GRP root $GRP\n" "" ""
+testing "symlink->file" "$IN chgrp $ROOTGRP dir2/file $OUT" \
+	"$GRP $GRP $GRP $ROOTGRP $GRP $GRP $GRP\n" "" ""
+testing "symlink->dir" "$IN chgrp $ROOTGRP dir2/dir $OUT" \
+	"$GRP $GRP $ROOTGRP $GRP $GRP $GRP $GRP\n" "" ""
+testing "-h symlink->dir" "$IN chgrp -h $ROOTGRP dir2/dir $OUT" \
+	"$GRP $GRP $GRP $GRP $GRP $ROOTGRP $GRP\n" "" ""
 
 # What does -h do (affect symlink, not target)
-testing "-h symlink->file" "$IN chgrp -h root dir2/file $OUT" \
-	"$GRP $GRP $GRP $GRP $GRP $GRP root\n" "" ""
-testing "-h symlink->dir" "$IN chgrp -h root dir2/dir $OUT" \
-	"$GRP $GRP $GRP $GRP $GRP root $GRP\n" "" ""
+testing "-h symlink->file" "$IN chgrp -h $ROOTGRP dir2/file $OUT" \
+	"$GRP $GRP $GRP $GRP $GRP $GRP $ROOTGRP\n" "" ""
+testing "-h symlink->dir" "$IN chgrp -h $ROOTGRP dir2/dir $OUT" \
+	"$GRP $GRP $GRP $GRP $GRP $ROOTGRP $GRP\n" "" ""
 
 # chgrp -R (note, -h is implied by -R)
 
-testing "-R dir" "$IN chgrp -R root dir $OUT" \
-	"root $GRP root root root $GRP $GRP\n" "" ""
-testing "-R dir2" "$IN chgrp -R root dir2 $OUT" \
-	"$GRP root $GRP $GRP $GRP root root\n" "" ""
-testing "-R symlink->dir" "$IN chgrp -R root dir2/dir $OUT" \
-	"$GRP $GRP $GRP $GRP $GRP root $GRP\n" "" ""
-testing "-R symlink->file" "$IN chgrp -R root dir2/file $OUT" \
-	"$GRP $GRP $GRP $GRP $GRP $GRP root\n" "" ""
+testing "-R dir" "$IN chgrp -R $ROOTGRP dir $OUT" \
+	"$ROOTGRP $GRP $ROOTGRP $ROOTGRP $ROOTGRP $GRP $GRP\n" "" ""
+testing "-R dir2" "$IN chgrp -R $ROOTGRP dir2 $OUT" \
+	"$GRP $ROOTGRP $GRP $GRP $GRP $ROOTGRP $ROOTGRP\n" "" ""
+testing "-R symlink->dir" "$IN chgrp -R weheel dir2/dir $OUT" \
+	"$GRP $GRP $GRP $GRP $GRP $ROOTGRP $GRP\n" "" ""
+testing "-R symlink->file" "$IN chgrp -R $ROOTGRP dir2/file $OUT" \
+	"$GRP $GRP $GRP $GRP $GRP $GRP $ROOTGRP\n" "" ""
 
 # chgrp -RP (same as -R by itself)
 
-testing "-RP dir2" "$IN chgrp -RP root dir2 $OUT" \
-	"$GRP root $GRP $GRP $GRP root root\n" "" ""
-testing "-RP symlink->dir" "$IN chgrp -RP root dir2/dir $OUT" \
-	"$GRP $GRP $GRP $GRP $GRP root $GRP\n" "" ""
-testing "-RP symlink->file" "$IN chgrp -RP root dir2/file $OUT" \
-	"$GRP $GRP $GRP $GRP $GRP $GRP root\n" "" ""
+testing "-RP dir2" "$IN chgrp -RP $ROOTGRP dir2 $OUT" \
+	"$GRP $ROOTGRP $GRP $GRP $GRP $ROOTGRP $ROOTGRP\n" "" ""
+testing "-RP symlink->dir" "$IN chgrp -RP $ROOTGRP dir2/dir $OUT" \
+	"$GRP $GRP $GRP $GRP $GRP $ROOTGRP $GRP\n" "" ""
+testing "-RP symlink->file" "$IN chgrp -RP $ROOTGRP dir2/file $OUT" \
+	"$GRP $GRP $GRP $GRP $GRP $GRP $ROOTGRP\n" "" ""
 
 # chgrp -RH (change target but only recurse through symlink->dir on cmdline)
 
-testing "-RH dir2" "$IN chgrp -RH root dir2 $OUT" \
-	"$GRP root root root $GRP $GRP $GRP\n" "" ""
-testing "-RH symlink->dir" "$IN chgrp -RH root dir2/dir $OUT" \
-	"$GRP $GRP root $GRP root $GRP $GRP\n" "" ""
-testing "-RH symlink->file" "$IN chgrp -RH root dir2/file $OUT" \
-	"$GRP $GRP $GRP root $GRP $GRP $GRP\n" "" ""
+testing "-RH dir2" "$IN chgrp -RH $ROOTGRP dir2 $OUT" \
+	"$GRP $ROOTGRP $ROOTGRP $ROOTGRP $GRP $GRP $GRP\n" "" ""
+testing "-RH symlink->dir" "$IN chgrp -RH $ROOTGRP dir2/dir $OUT" \
+	"$GRP $GRP $ROOTGRP $GRP $ROOTGRP $GRP $GRP\n" "" ""
+testing "-RH symlink->file" "$IN chgrp -RH $ROOTGRP dir2/file $OUT" \
+	"$GRP $GRP $GRP $ROOTGRP $GRP $GRP $GRP\n" "" ""
 
 # chgrp -RL (change target and always recurse through symlink->dir)
 
-testing "-RL dir2" "$IN chgrp -RL root dir2 $OUT" \
-	"$GRP root root root root $GRP $GRP\n" "" ""
-testing "-RL symlink->dir" "$IN chgrp -RL root dir2/dir $OUT" \
-	"$GRP $GRP root $GRP root $GRP $GRP\n" "" ""
-testing "-RL symlink->file" "$IN chgrp -RL root dir2/file $OUT" \
-	"$GRP $GRP $GRP root $GRP $GRP $GRP\n" "" ""
+testing "-RL dir2" "$IN chgrp -RL $ROOTGRP dir2 $OUT" \
+	"$GRP $ROOTGRP $ROOTGRP $ROOTGRP $ROOTGRP $GRP $GRP\n" "" ""
+testing "-RL symlink->dir" "$IN chgrp -RL $ROOTGRP dir2/dir $OUT" \
+	"$GRP $GRP $ROOTGRP $GRP $ROOTGRP $GRP $GRP\n" "" ""
+testing "-RL symlink->file" "$IN chgrp -RL $ROOTGRP dir2/file $OUT" \
+	"$GRP $GRP $GRP $ROOTGRP $GRP $GRP $GRP\n" "" ""
 
 # -HLP are NOPs without -R
-testing "-H without -R" "$IN chgrp -H root dir2/dir $OUT" \
-	"$GRP $GRP root $GRP $GRP $GRP $GRP\n" "" ""
-testing "-L without -R" "$IN chgrp -L root dir2/dir $OUT" \
-	"$GRP $GRP root $GRP $GRP $GRP $GRP\n" "" ""
-testing "-P without -R" "$IN chgrp -P root dir2/dir $OUT" \
-	"$GRP $GRP root $GRP $GRP $GRP $GRP\n" "" ""
+testing "-H without -R" "$IN chgrp -H $ROOTGRP dir2/dir $OUT" \
+	"$GRP $GRP $ROOTGRP $GRP $GRP $GRP $GRP\n" "" ""
+testing "-L without -R" "$IN chgrp -L $ROOTGRP dir2/dir $OUT" \
+	"$GRP $GRP $ROOTGRP $GRP $GRP $GRP $GRP\n" "" ""
+testing "-P without -R" "$IN chgrp -P $ROOTGRP dir2/dir $OUT" \
+	"$GRP $GRP $ROOTGRP $GRP $GRP $GRP $GRP\n" "" ""
 
 rm -rf testdir
