@@ -9,7 +9,7 @@ then
   exit
 fi
 
-ROOTGRP=root
+ROOTGRP=wheel
 # We chgrp between "$ROOTGRP" and the last group in /etc/group.
 
 GRP="$(sed -n '$s/:.*//p' /etc/group)"
